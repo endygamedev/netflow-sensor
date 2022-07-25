@@ -1,0 +1,108 @@
+\section*{Постановка задачи}
+\addcontentsline{toc}{section}{Постановка задачи}
+
+\textit{Цель задачи:} создать программу NetFlow-сенсор, поддерживающую NetFlow export protocol версии 9.
+
+\linespace
+
+\textit{Требования:}
+\begin{enumerate}[wide, noitemsep]
+    \item ПО должно работать на ПК под управлением Debian GNU\textbackslash Linux (версии 10 и новее).
+    \item Для реализации использовать язык программирования C.
+    \item Сборка должна осуществляться GNU Toolchain.
+    \item Дистрибуция должна осуществляться при помощи deb-пакета.
+    \item Сенсор должен иметь следующие параметры запуска:
+    \begin{enumerate}[wide=\dimexpr\parindent+1.25cm, noitemsep]
+        \item имя сетевого интерфейса, на котором вести учёт трафика
+        \item IP-адрес и номер UDP-порта хоста с NetFlow-коллектором, куда отправлять пакеты с данными по статистике, формат IP:порт (например, 192.168.0.2:9995)
+    \end{enumerate}
+    \item Основной приоритет при разработке: постараться максимизировать нагрузку, которую может обработать программа, не пропуская пакеты.
+\end{enumerate}
+
+\linespace
+
+Описание протокола NetFlowV9: \url{https://www.ietf.org/rfc/rfc3954.txt}
+
+\linespace
+
+Определение потока: поток (flow) это пакеты, имеющие одинаковые поля:
+\begin{itemize}[wide, noitemsep]
+    \item IP адрес источника;
+    \item IP адрес получателя;
+    \item Для TCP/UDP пакетов:
+        \begin{itemize}[wide=\dimexpr\parindent+1.25cm, noitemsep]
+            \item TCP/UDP порт источника;
+            \item TCP/UDP порт получателя;
+        \end{itemize}
+    \item Для ICMP пакетов:
+        \begin{itemize}[wide=\dimexpr\parindent+1.25cm, noitemsep]
+            \item ICMP код;
+            \item ICMP тип;
+        \end{itemize}
+    \item Протокол L4 (поле IP Protocol Number);
+    \item IP ToS.
+\end{itemize}        
+
+\linespace
+
+Сенсор должен запускаться с указанием сетевого интерфейса, на котором вести учёт трафика, без подтверждения пользователя приступать к учёту и вести его до прерывания работы пользователем.
+
+\linespace
+
+Пакет NetFlow должен содержать следующий набор полей:
+\begin{itemize}[wide, noitemsep]
+    \item IN\_BYTES,
+    \item IN\_PKTS,
+    \item FLOWS,
+    \item PROTOCOL,
+    \item SRC\_TOS,
+    \item TCP\_FLAGS,
+    \item L4\_SRC\_PORT,
+    \item IPV4\_SRC\_ADDR,
+    \item INPUT\_SNMP,
+    \item L4\_DST\_PORT,
+    \item IPV4\_DST\_ADDR,
+    \item LAST\_SWITCHED,
+    \item FIRST\_SWITCHED,
+    \item ICMP\_TYPE,
+    \item FLOW\_ACTIVE\_TIMEOUT,
+    \item FLOW\_INACTIVE\_TIMEOUT,
+    \item IPV4\_IDENT,
+    \item IN\_SRC\_MAC,
+    \item IN\_DST\_MAC,
+    \item IF\_NAME.
+\end{itemize}
+
+\newpage
+
+\textit{Проверка работы}
+
+\linespace
+
+Сенсор отправляет данные в коллектор. В качестве коллектора для тестирования можно использовать, например, \verb|nfcapd| из пакета \verb|nfdump|. Отправять отладочный трафик на интерфейс можно при помощи утилиты \verb|tcpreplay| из одноимённого пакета. Для генерации дампа отладочного трафика можно использовать: \url{https://github.com/cslev/pcap_generator}.
+
+\linespace
+
+Вместе с кодом нужно предоставить информацию о максимальной нагрузке, которую может выдержать предложенная реализация.
+
+\linespace
+
+\textit{Рекомендации}
+
+\linespace
+
+Пример проекта, который можно из исходников собрать в deb-пакет:\\
+\url{https://gitlab.com/vgeo89/examples/-/tree/main/deb_package}
+
+\linespace
+
+\textit{Информация}
+
+\linespace
+
+\begin{itemize}[wide, noitemsep]
+    \item \url{http://xgu.ru/wiki/NetFlow}
+    \item \url{https://www.ietf.org/rfc/rfc3954.txt}
+    \item \url{https://www.cisco.com/en/US/technologies/tk648/tk362/technologies_white_paper09186a00800a3db9.html}
+    \item \url{https://habr.com/ru/company/metrotek/blog/327894/}
+\end{itemize}
